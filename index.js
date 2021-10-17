@@ -26,13 +26,29 @@ app.post('/events', (req, res) => {
   }
 
   if (type === 'CommentCreated') {
-    const { id, content, postId } = data;
+    const { id, content, postId, status } = data;
     const post = posts[postId];
 
-    post.comments.push({ id, content });
+    post.comments.push({ id, content, status });
+  }
+
+  if (type === 'CommentUpdated') {
+    const { id, content, postId, status } = data;
+    const post = posts[postId];
+
+    const comment = post.comments.find((comment) => comment.id === id);
+
+    comment.status = status;
+    comment.content = content;
   }
 
   res.status(201).json({});
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ error: err.message });
+
+  console.log(err.message);
 });
 
 app.listen(4002, () => {
